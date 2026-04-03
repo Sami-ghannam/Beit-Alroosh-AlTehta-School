@@ -24,7 +24,6 @@
 
         .container { max-width: 600px; margin: 0 auto; }
 
-        /* شاشات الدخول */
         .auth-card {
             background: var(--card);
             padding: 30px;
@@ -34,7 +33,6 @@
             margin-top: 50px;
         }
 
-        /* قسم الفلترة */
         .filter-section {
             background: var(--card);
             padding: 20px;
@@ -52,7 +50,6 @@
             font-size: 1rem;
         }
 
-        /* بطاقات الحصص */
         .lesson-card {
             background: var(--card);
             border-radius: 18px;
@@ -109,7 +106,7 @@
 
     <div id="mainApp" style="display:none;">
         <div style="display:flex; justify-content: space-between; align-items: center;">
-            <h2 id="appTitle">الجدول الدراسي</h2>
+            <h2 id="appTitle">جاري تحميل البيانات...</h2>
             <button onclick="logout()" style="color:var(--danger); border:none; background:none; cursor:pointer;">خروج</button>
         </div>
 
@@ -143,23 +140,42 @@
 </div>
 
 <script>
-    // بيانات الجدول (6 حصص يومياً)
-    const sheetURL = https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8Yk6Sq2bCZtlrH-mgqDZFYnRc54MYf8vAW6VIpW1WHIzKi5lkoBRTXjv5i8sXBkHMrbR_KHS-kMoV/pub?gid=0&single=true&output=csv
+    // الرابط الخاص بك
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8Yk6Sq2bCZtlrH-mgqDZFYnRc54MYf8vAW6VIpW1WHIzKi5lkoBRTXjv5i8sXBkHMrbR_KHS-kMoV/pub?gid=0&single=true&output=csv';
+    
+    let rawData = []; // سيتم ملؤه من Google Sheets
 
-async function fetchSheetData() {
-    try {
-        const response = await fetch(sheetURL);
-        const data = await response.text();
-        // هنا نقوم بتحويل نص CSV إلى مصفوفة يفهمها الكود
-        parseCSV(data);
-    } catch (error) {
-        console.error("خطأ في جلب البيانات:", error);
+    async function fetchSheetData() {
+        try {
+            const response = await fetch(sheetURL);
+            const data = await response.text();
+            parseCSV(data);
+        } catch (error) {
+            console.error("خطأ في جلب البيانات:", error);
+            alert("فشل تحميل البيانات من Google Sheets");
+        }
     }
-} 
 
-
-
-
+    function parseCSV(csvText) {
+        const lines = csvText.split('\n');
+        rawData = [];
+        // نفترض أن الترتيب: اليوم، الصف، المادة، المعلم، البدء، النهاية، الرابط
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',');
+            if (cols.length >= 7) {
+                rawData.push({
+                    day: cols[0].trim(),
+                    grade: cols[1].trim(),
+                    subject: cols[2].trim(),
+                    teacher: cols[3].trim(),
+                    start: cols[4].trim(),
+                    end: cols[5].trim(),
+                    link: cols[6].trim()
+                });
+            }
+        }
+        updateUI(); 
+    }
 
     function handleLogin() {
         const code = document.getElementById('passCode').value;
@@ -176,7 +192,7 @@ async function fetchSheetData() {
         }
     }
 
-    function startSystem() {
+    async function startSystem() {
         const role = localStorage.getItem('user_role');
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
@@ -184,6 +200,8 @@ async function fetchSheetData() {
         if (role === 'teacher') {
             document.getElementById('teacherPanel').style.display = 'block';
             document.getElementById('appTitle').innerText = "لوحة التحكم 👨‍🏫";
+        } else {
+            document.getElementById('appTitle').innerText = "الجدول الدراسي";
         }
 
         // تحديد اليوم الحالي تلقائياً
@@ -193,14 +211,17 @@ async function fetchSheetData() {
             document.getElementById('daySelect').value = today;
         }
 
-        updateUI();
+        await fetchSheetData(); // جلب البيانات أولاً
+        
         setInterval(updateUI, 30000); 
         if (role === 'student') scheduleNotifications();
     }
 
     function updateUI() {
         const grid = document.getElementById('lessonsGrid');
+        if (!grid) return;
         grid.innerHTML = '';
+        
         const selectedDay = document.getElementById('daySelect').value;
         const selectedGrade = document.getElementById('gradeSelect').value;
         
@@ -210,7 +231,7 @@ async function fetchSheetData() {
         const filtered = rawData.filter(item => item.day === selectedDay && item.grade === selectedGrade);
 
         if (filtered.length === 0) {
-            grid.innerHTML = '<p style="text-align:center;">لا توجد حصص مجدولة.</p>';
+            grid.innerHTML = '<p style="text-align:center;">لا توجد حصص مجدولة لهذا الاختيار.</p>';
             return;
         }
 
@@ -233,6 +254,7 @@ async function fetchSheetData() {
             card.innerHTML = `
                 ${progressHtml}
                 <h3 style="margin:0">${lesson.subject}</h3>
+                <p style="color:gray; font-size:0.9rem;">👨‍🏫 ${lesson.teacher}</p>
                 <p>⏰ ${lesson.start} - ${lesson.end}</p>
                 <button class="btn btn-primary" onclick="joinSession('${lesson.subject}', '${lesson.link}')">🚀 دخول الحصة</button>
             `;
@@ -249,7 +271,6 @@ async function fetchSheetData() {
                 if (name) localStorage.setItem('student_name', name);
                 else return;
             }
-            // رصد الحضور
             const logs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
             logs.push({ name, subject, time: new Date().toLocaleTimeString('ar-EG'), date: new Date().toLocaleDateString('ar-EG') });
             localStorage.setItem('attendance_logs', JSON.stringify(logs));
@@ -258,12 +279,10 @@ async function fetchSheetData() {
     }
 
     function scheduleNotifications() {
-        // برمجة التنبيهات الذكية قبل دقيقة من كل حصة
         rawData.forEach(lesson => {
             const [h, m] = lesson.start.split(':').map(Number);
             const alertTime = new Date();
             alertTime.setHours(h, m - 1, 0); 
-            
             const diff = alertTime.getTime() - new Date().getTime();
             if (diff > 0) {
                 setTimeout(() => {
@@ -277,24 +296,24 @@ async function fetchSheetData() {
         const display = document.getElementById('attendanceDisplay');
         const logs = JSON.parse(localStorage.getItem('attendance_logs') || '[]');
         display.style.display = 'block';
-        
         if (logs.length === 0) { display.innerHTML = "لا يوجد سجل حضور حالياً."; return; }
-
-        // تصنيف الحضور حسب المادة
         const grouped = logs.reduce((acc, obj) => {
             acc[obj.subject] = acc[obj.subject] || [];
             acc[obj.subject].push(`• ${obj.name} (${obj.time})`);
             return acc;
         }, {});
-
-        display.innerHTML = '<h4>قائمة الحضور اليوم:</h4>';
+        display.innerHTML = '<h4>قائمة الحضور المسجلة:</h4>';
         for (const sub in grouped) {
             display.innerHTML += `<b>🔹 ${sub}:</b><br>${grouped[sub].join('<br>')}<br><br>`;
         }
     }
 
     function logout() { localStorage.clear(); location.reload(); }
-    if (localStorage.getItem('user_role')) startSystem();
+    
+    // التحقق عند فتح الصفحة
+    window.onload = () => {
+        if (localStorage.getItem('user_role')) startSystem();
+    };
 </script>
 </body>
 </html>

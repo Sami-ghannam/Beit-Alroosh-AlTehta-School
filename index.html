@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة التعلم عن بعد الشاملة</title>
+    <title>تصميم وبرمجة: م. سامي غنام</title>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -99,7 +101,7 @@
 <div class="container">
     <div id="loginScreen" class="auth-card">
         <h2>👋 مرحباً بك</h2>
-        <p>أدخل الرمز للدخول (طالب: 1234 | معلم: 5678)</p>
+        <p>أدخل الرمز للدخول </p>
         <input type="password" id="passCode" placeholder="الرمز السري">
         <button class="btn btn-primary" onclick="handleLogin()">دخول النظام</button>
     </div>
@@ -147,7 +149,7 @@
 </div>
 
 <script>
-    // الرابط الخاص بك
+   
     const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8Yk6Sq2bCZtlrH-mgqDZFYnRc54MYf8vAW6VIpW1WHIzKi5lkoBRTXjv5i8sXBkHMrbR_KHS-kMoV/pub?gid=0&single=true&output=csv';
     
     let rawData = []; // سيتم ملؤه من Google Sheets
@@ -187,8 +189,8 @@
     function handleLogin() {
         const code = document.getElementById('passCode').value;
         let role = '';
-        if (code === "1234") role = 'student';
-        else if (code === "5678") role = 'teacher';
+        if (code === "1") role = 'student';
+        else if (code === "2050") role = 'teacher';
 
         if (role) {
             localStorage.setItem('user_role', role);

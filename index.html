@@ -188,8 +188,8 @@
     function handleLogin() {
         const code = document.getElementById('passCode').value;
         let role = '';
-        if (code === "1") role = 'student';
-        else if (code === "2261") role = 'teacher';
+        if (code === "1" || code === "١") role = 'student';
+        else if (code === "2261" || code === "٢٢٦١") role = 'teacher';
 
         if (role) {
             localStorage.setItem('user_role', role);

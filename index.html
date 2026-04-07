@@ -18,6 +18,14 @@
         .top-bar div { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
         #userBadge { background: var(--primary); color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 10px; display: none; }
 
+        /* Error Message Style */
+        #errorToast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 12px 25px; border-radius: 50px;
+            display: none; align-items: center; gap: 15px; z-index: 3000; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            font-size: 0.9rem; width: 90%; max-width: 400px; justify-content: space-between;
+        }
+
         #mainApp { 
             display: none; padding: 20px; padding-bottom: 120px; flex: 1; 
             background-image: linear-gradient(rgba(241, 245, 249, 0.94), rgba(241, 245, 249, 0.94)), url('https://github.com/Sami-ghannam/Beit-Alroosh-AlTehta-School/blob/main/logo.png?raw=true');
@@ -43,12 +51,10 @@
         .btn-exit { background: var(--danger); color: white; box-shadow: 0 6px 0 var(--danger-dark); }
         .btn-go { background: var(--success); color: white; box-shadow: 0 5px 0 #059669; }
         .btn-locked { background: var(--gray); color: white; cursor: not-allowed; opacity: 0.8; }
-        .btn-ended { background: var(--danger); color: white; cursor: not-allowed; }
 
         .lesson-card { border-radius: 18px; padding: 15px; margin-bottom: 12px; border: 2px solid #e2e8f0; text-align: right; width: 100%; box-sizing: border-box; background: white; }
         .highlight-card { border-color: var(--highlight) !important; background-color: #fff7ed !important; }
 
-        /* جدول الإدارة */
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; background: white; border-radius: 10px; overflow: hidden; }
         .admin-table th { background: #f8fafc; padding: 10px; border-bottom: 2px solid #e2e8f0; }
         .admin-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; text-align: center; }
@@ -58,6 +64,11 @@
     </style>
 </head>
 <body>
+
+<div id="errorToast">
+    <span id="errorMsg">خطأ في الاتصال بالإنترنت</span>
+    <button onclick="retryConnection()" style="background:var(--primary); color:white; border:none; padding:5px 12px; border-radius:15px; cursor:pointer; font-size:0.8rem;">تحديث</button>
+</div>
 
 <div class="top-bar">
     <div class="live-date">--/--/----</div>
@@ -103,7 +114,9 @@
                     <select id="teacherSelect" onchange="updateUI()"><option value="">--- المعلم (اختياري) ---</option></select>
                 </div>
 
-                <div id="displayArea" style="width: 100%; margin-top: 15px;"></div>
+                <div id="displayArea" style="width: 100%; margin-top: 15px;">
+                    <p id="loadingMsg">جاري مزامنة البيانات...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -121,32 +134,61 @@
     let serverTimeOffset = 0;
     const weekDaysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
 
+    function showError(msg) {
+        const toast = document.getElementById('errorToast');
+        document.getElementById('errorMsg').innerText = msg;
+        toast.style.display = 'flex';
+        setTimeout(() => { toast.style.display = 'none'; }, 6000);
+    }
+
     async function syncTime() {
-        try { const r = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron'); const d = await r.json(); serverTimeOffset = new Date(d.datetime).getTime() - Date.now(); } catch(e){}
+        try { 
+            const r = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron', { signal: AbortSignal.timeout(5000) });
+            const d = await r.json(); 
+            serverTimeOffset = new Date(d.datetime).getTime() - Date.now(); 
+        } catch(e){
+            showError("فشل مزامنة الوقت. تأكد من الإنترنت.");
+            serverTimeOffset = 0; 
+        }
     }
 
     async function loadData() {
-        const r = await fetch(sheetURL + '&t=' + Date.now());
-        const t = await r.text();
-        rawData = t.split('\n').slice(1).filter(row => row.trim() !== "").map(row => {
-            const c = row.split(',');
-            return { day: c[0].trim(), grade: c[1].trim(), sub: c[2].trim(), teacher: c[3].trim(), s: c[4].trim(), e: c[5].trim(), link: c[6].trim() };
-        });
-        if(sessionStorage.getItem('cluster_badgeText') === 'ادارة واشراف') {
-            const ts = document.getElementById('teacherSelect');
-            ts.innerHTML = '<option value="">--- المعلم (اختياري) ---</option>';
-            [...new Set(rawData.map(i => i.teacher))].sort().forEach(t => ts.innerHTML += `<option value="${t}">${t}</option>`);
+        try {
+            const r = await fetch(sheetURL + '&t=' + Date.now(), { signal: AbortSignal.timeout(7000) });
+            if (!r.ok) throw new Error();
+            const t = await r.text();
+            rawData = t.split('\n').slice(1).filter(row => row.trim() !== "").map(row => {
+                const c = row.split(',');
+                return { day: c[0].trim(), grade: c[1].trim(), sub: c[2].trim(), teacher: c[3].trim(), s: c[4].trim(), e: c[5].trim(), link: c[6].trim() };
+            });
+            
+            if(sessionStorage.getItem('cluster_badgeText') === 'ادارة واشراف') {
+                const ts = document.getElementById('teacherSelect');
+                ts.innerHTML = '<option value="">--- المعلم (اختياري) ---</option>';
+                [...new Set(rawData.map(i => i.teacher))].sort().forEach(t => ts.innerHTML += `<option value="${t}">${t}</option>`);
+            }
+            updateUI();
+        } catch(e) {
+            showError("فشل تحميل جدول الحصص.");
+            document.getElementById('displayArea').innerHTML = '<div style="color:var(--danger); padding:20px;">خطأ في تحميل البيانات. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</div>';
         }
-        updateUI();
+    }
+
+    function retryConnection() {
+        document.getElementById('errorToast').style.display = 'none';
+        syncTime().then(loadData);
     }
 
     function handleLogin() {
         const pass = document.getElementById('sysPass').value.trim();
+        if (!navigator.onLine) { showError("أنت غير متصل بالإنترنت حالياً."); return; }
+        
         let portal = '', badge = '';
         if (pass === "1") { portal = 'بوابة الطلبة'; badge = 'طالب'; }
         else if (pass === "1111") { portal = 'بوابة المعلمين'; badge = 'معلم'; }
         else if (pass === "1234") { portal = 'بوابة الإدارة والاشراف'; badge = 'ادارة واشراف'; }
         else { alert("الرمز خطأ"); return; }
+        
         sessionStorage.setItem('cluster_isLoggedIn', 'true');
         sessionStorage.setItem('cluster_portalText', portal);
         sessionStorage.setItem('cluster_badgeText', badge);
@@ -183,7 +225,7 @@
         const isToday = (weekDaysArr[now.getDay()] === day);
 
         let filtered = rawData.filter(i => i.day === day && (grade === "" || i.grade === grade) && (teacher === "" || i.teacher === teacher));
-        area.innerHTML = filtered.length ? '' : '<p>لا توجد حصص</p>';
+        area.innerHTML = filtered.length ? '' : '<p>لا توجد حصص لهذا الاختيار</p>';
 
         if (isAdmin) {
             let tableHTML = `<table class="admin-table"><thead><tr><th>المادة</th><th>المعلم</th><th>الوقت</th><th>الحالة</th></tr></thead><tbody>`;
@@ -216,11 +258,13 @@
     function handleLogout() { sessionStorage.clear(); location.reload(); }
     function hardReset() { if(confirm("مسح الكاش؟")) { localStorage.clear(); sessionStorage.clear(); location.reload(); } }
     function showInstructions() { alert("تعليمات: اختر اليوم والصف لعرض الجدول. زر الدخول يتفعل وقت الحصة."); }
+    
     function updateClock() {
         const n = new Date(Date.now() + serverTimeOffset);
         document.querySelector('.live-clock').innerText = n.toLocaleTimeString('ar-EG');
         document.querySelector('.live-date').innerText = n.toLocaleDateString('ar-EG', {day:'numeric', month:'long'});
     }
+    
     setInterval(updateClock, 1000);
     window.onload = () => { if (sessionStorage.getItem('cluster_isLoggedIn')) showApp(); else updateClock(); };
 </script>

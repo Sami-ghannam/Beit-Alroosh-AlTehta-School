@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة العنقود الرقمية</title>
+    <title>منصة العنقود الرقمية - نظام التنبيهات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -12,7 +12,7 @@
             --highlight: #f97316; --border: #e2e8f0;
         }
 
-        /* --- الإضافة الجديدة: تنسيق بطاقات الإحصائيات للإدارة --- */
+        /* تنسيق بطاقات الإحصائيات */
         .admin-stats-container {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
             width: 100%; margin-bottom: 20px;
@@ -25,6 +25,10 @@
         .stat-card i { color: var(--primary); font-size: 1.2rem; margin-bottom: 5px; }
         .stat-number { display: block; font-size: 1.1rem; font-weight: 900; color: var(--text); }
         .stat-label { font-size: 0.65rem; color: var(--gray); font-weight: bold; }
+
+        /* تنسيق التنبيهات الذكية */
+        .badge-alert { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; border: 1px solid #fca5a5; display: inline-block; margin-top: 4px; }
+        .badge-warning { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; border: 1px solid #fcd34d; display: inline-block; margin-top: 4px; }
 
         /* تنسيقات الوضع الليلي */
         body.dark-mode {
@@ -65,19 +69,11 @@
         .modal-buttons { display: flex; gap: 10px; margin-top: 25px; }
         .btn-modal { flex: 1; padding: 14px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
 
-        #errorToast {
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: white; padding: 12px 25px; border-radius: 50px;
-            display: none; align-items: center; gap: 15px; z-index: 3000; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            font-size: 0.9rem; width: 90%; max-width: 400px; justify-content: space-between;
-        }
-
         #mainApp { 
             display: none; padding: 20px; padding-bottom: 120px; flex: 1; 
             background-image: linear-gradient(rgba(241, 245, 249, 0.94), rgba(241, 245, 249, 0.94)), url('https://github.com/Sami-ghannam/Beit-Alroosh-AlTehta-School/blob/main/logo.png?raw=true');
             background-repeat: no-repeat; background-position: center 35%; background-size: 300px; background-attachment: fixed;
         }
-        body.dark-mode #mainApp { background-image: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)), url('https://github.com/Sami-ghannam/Beit-Alroosh-AlTehta-School/blob/main/logo.png?raw=true'); }
 
         .inner-app-content { background: var(--card); padding: 30px 20px; border-radius: 32px; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .welcome-page { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; gap: 20px; padding-bottom: 100px; }
@@ -97,9 +93,6 @@
         .btn-exit { background: var(--danger); color: white; box-shadow: 0 6px 0 var(--danger-dark); }
         .btn-go { background: var(--success); color: white; box-shadow: 0 5px 0 #059669; }
         .btn-locked { background: var(--gray); color: white; cursor: not-allowed; opacity: 0.8; }
-
-        .lesson-card { border-radius: 18px; padding: 15px; margin-bottom: 12px; border: 2px solid var(--border); text-align: right; width: 100%; box-sizing: border-box; background: var(--card); }
-        .highlight-card { border-color: var(--highlight) !important; background-color: rgba(249, 115, 22, 0.05) !important; border-width: 3px !important; animation: pulse-active 2s infinite linear; }
 
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; background: var(--card); border-radius: 10px; overflow: hidden; color: var(--text); }
         .admin-table th { background: rgba(0,0,0,0.03); padding: 12px; border-bottom: 2px solid var(--border); }
@@ -123,17 +116,9 @@
     </div>
 </div>
 
-<div id="errorToast">
-    <span id="errorMsg">استغرق الاتصال وقتاً طويلاً</span>
-    <button onclick="retryConnection()" style="background:var(--primary); color:white; border:none; padding:5px 12px; border-radius:15px; cursor:pointer; font-size:0.8rem;">تحديث</button>
-</div>
-
 <div class="top-bar">
     <div class="live-date">--/--/----</div>
-    <div id="dynamicHeader">
-        <i class="fas fa-moon theme-toggle" onclick="toggleTheme()" id="themeIcon"></i>
-        منصة العنقود
-    </div>
+    <div id="dynamicHeader"><i class="fas fa-moon theme-toggle" onclick="toggleTheme()" id="themeIcon"></i> منصة العنقود</div>
     <div style="display: flex; align-items: center;"><span id="userBadge"></span><div class="live-clock">--:--:--</div></div>
 </div>
 
@@ -159,241 +144,11 @@
     <div class="app-container" style="max-width: 950px; margin: 0 auto;">
         
         <div id="adminStatsArea" style="display:none;" class="admin-stats-container">
-            <div class="stat-card">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <span id="statActiveCount" class="stat-number">0</span>
-                <span class="stat-label">حصص جارية الآن</span>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-check-circle"></i>
-                <span id="statDoneCount" class="stat-number">0</span>
-                <span class="stat-label">حصص منتهية</span>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-chart-line"></i>
-                <span id="statProgress" class="stat-number">0%</span>
-                <span class="stat-label">نسبة الإنجاز اليومي</span>
-            </div>
+            <div class="stat-card"><i class="fas fa-chalkboard-teacher"></i><span id="statActiveCount" class="stat-number">0</span><span class="stat-label">حصص جارية الآن</span></div>
+            <div class="stat-card"><i class="fas fa-check-circle"></i><span id="statDoneCount" class="stat-number">0</span><span class="stat-label">حصص منتهية</span></div>
+            <div class="stat-card"><i class="fas fa-chart-line"></i><span id="statProgress" class="stat-number">0%</span><span class="stat-label">نسبة الإنجاز</span></div>
         </div>
 
         <div class="welcome-frame">
             <div class="inner-app-content">
                 <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:15px;">
-                    <h4 id="portalTitle" style="margin:0; color:var(--primary);">بوابة الحصص</h4>
-                    <button onclick="handleLogout()" style="border:none; background:none; color:var(--danger); cursor:pointer; font-weight:bold;">تسجيل خروج</button>
-                </div>
-                
-                <div id="filterContainer" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
-                    <select id="daySelect" onchange="updateUI()"><option value="">--- اليوم ---</option></select>
-                    <select id="gradeSelect" onchange="updateUI()">
-                        <option value="">--- الصف ---</option>
-                        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-                        <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-                        <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
-                    </select>
-                </div>
-                <div id="adminTeacherFilter" style="width:100%; margin-top:10px; display:none;">
-                    <select id="teacherSelect" onchange="updateUI()"><option value="">--- المعلم (اختياري) ---</option></select>
-                </div>
-
-                <div id="displayArea" style="width: 100%; margin-top: 15px;">
-                    <p id="loadingMsg">جاري مزامنة البيانات...</p>
-                </div>
-                <div id="syncStatus" style="font-size: 0.7rem; color: var(--gray); margin-top: 10px;"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="quick-links-bar">
-    <div class="q-link" onclick="alert('تصميم وبرمجة: م. سامي غنام')"><i class="fas fa-user-shield"></i> حول المصمم</div>
-    <div class="q-link" onclick="showInstructions()" style="color: var(--highlight);"><i class="fas fa-info-circle"></i> تعليمات</div>
-    <div class="q-link" onclick="loadData()"><i class="fas fa-sync"></i>تحديث يدوي</div>
-</div>
-
-<script>
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8Yk6Sq2bCZtlrH-mgqDZFYnRc54MYf8vAW6VIpW1WHIzKi5lkoBRTXjv5i8sXBkHMrbR_KHS-kMoV/pub?gid=0&single=true&output=csv';
-    let rawData = [];
-    let serverTimeOffset = 0;
-    const weekDaysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
-
-    function toggleTheme() {
-        document.body.classList.toggle('dark-mode');
-        const isDark = document.body.classList.contains('dark-mode');
-        localStorage.setItem('cluster_theme', isDark ? 'dark' : 'light');
-        updateThemeIcon();
-    }
-
-    function updateThemeIcon() {
-        const icon = document.getElementById('themeIcon');
-        if(icon) icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun theme-toggle' : 'fas fa-moon theme-toggle';
-    }
-
-    setInterval(() => { if (sessionStorage.getItem('cluster_isLoggedIn')) loadData(true); }, 300000);
-
-    function hardReset() {
-        const modal = document.getElementById('logoutModal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('modal-show'), 10);
-    }
-
-    function closeLogoutModal() {
-        const modal = document.getElementById('logoutModal');
-        modal.classList.remove('modal-show');
-        setTimeout(() => modal.style.display = 'none', 300);
-    }
-
-    function confirmHardReset() {
-        document.body.style.opacity = "0";
-        setTimeout(() => { localStorage.clear(); sessionStorage.clear(); window.location.replace("https://www.google.ps"); }, 500);
-    }
-
-    function showError(msg) {
-        const toast = document.getElementById('errorToast');
-        document.getElementById('errorMsg').innerText = msg;
-        toast.style.display = 'flex';
-        setTimeout(() => { toast.style.display = 'none'; }, 6000);
-    }
-
-    async function syncTime() {
-        try { 
-            const r = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron', { signal: AbortSignal.timeout(5000) });
-            const d = await r.json(); 
-            serverTimeOffset = new Date(d.datetime).getTime() - Date.now(); 
-        } catch(e){ serverTimeOffset = 0; }
-    }
-
-    async function loadData(isAuto = false) {
-        const area = document.getElementById('displayArea');
-        if(!isAuto) area.innerHTML = '<p id="loadingMsg">جاري المزامنة مع السيرفر...</p>';
-
-        try {
-            const r = await fetch(sheetURL + '&t=' + Date.now(), { signal: AbortSignal.timeout(10000) });
-            const t = await r.text();
-            rawData = t.split('\n').slice(1).filter(row => row.trim() !== "").map(row => {
-                const c = row.split(',');
-                return { day: (c[0]||'').trim(), grade: (c[1]||'').trim(), sub: (c[2]||'').trim(), teacher: (c[3]||'').trim(), s: (c[4]||'').trim(), e: (c[5]||'').trim(), link: (c[6]||'').trim() };
-            });
-            
-            if(sessionStorage.getItem('cluster_badgeText') === 'ادارة واشراف') {
-                const ts = document.getElementById('teacherSelect');
-                const currentVal = ts.value;
-                ts.innerHTML = '<option value="">--- المعلم (اختياري) ---</option>';
-                [...new Set(rawData.map(i => i.teacher))].sort().filter(n => n).forEach(t => ts.innerHTML += `<option value="${t}">${t}</option>`);
-                ts.value = currentVal;
-            }
-            updateUI();
-            document.getElementById('syncStatus').innerText = "آخر تحديث تلقائي: " + new Date().toLocaleTimeString('ar-EG');
-        } catch(e) { if(!isAuto) showError("فشل مزامنة البيانات"); }
-    }
-
-    function handleLogin() {
-        const pass = document.getElementById('sysPass').value.trim();
-        let portal = '', badge = '';
-        if (pass === "1") { portal = 'بوابة الطالب'; badge = 'طالب'; }
-        else if (pass === "1111") { portal = 'بوابة المعلم'; badge = 'معلم'; }
-        else if (pass === "1234") { portal = 'بوابة الإدارة والاشراف'; badge = 'ادارة واشراف'; }
-        else { alert("الرمز خطأ"); return; }
-        
-        sessionStorage.setItem('cluster_isLoggedIn', 'true');
-        sessionStorage.setItem('cluster_portalText', portal);
-        sessionStorage.setItem('cluster_badgeText', badge);
-        showApp();
-    }
-
-    function showApp() {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('portalTitle').innerText = sessionStorage.getItem('cluster_portalText');
-        document.getElementById('userBadge').innerText = sessionStorage.getItem('cluster_badgeText');
-        document.getElementById('userBadge').style.display = 'inline-block';
-        
-        if(sessionStorage.getItem('cluster_badgeText') === 'ادارة واشراف') {
-            document.getElementById('adminTeacherFilter').style.display = 'block';
-            document.getElementById('adminStatsArea').style.display = 'grid';
-        }
-
-        const ds = document.getElementById('daySelect');
-        ds.innerHTML = '<option value="">--- اليوم ---</option>';
-        weekDaysArr.forEach(d => ds.innerHTML += `<option value="${d}">${d}</option>`);
-        ds.value = weekDaysArr[new Date().getDay()] || "الأحد";
-        syncTime().then(() => loadData());
-    }
-
-    function updateUI() {
-        const area = document.getElementById('displayArea');
-        const day = document.getElementById('daySelect').value;
-        const grade = document.getElementById('gradeSelect').value;
-        const isAdmin = sessionStorage.getItem('cluster_badgeText') === 'ادارة واشراف';
-        const teacher = isAdmin ? document.getElementById('teacherSelect').value : "";
-        
-        const now = new Date(Date.now() + serverTimeOffset);
-        const curMins = now.getHours() * 60 + now.getMinutes();
-        const isToday = (weekDaysArr[now.getDay()] === day);
-
-        let filtered = rawData.filter(i => i.day === day && (grade === "" || i.grade === grade) && (teacher === "" || i.teacher === teacher));
-        
-        // حساب إحصائيات الإدارة
-        if(isAdmin) {
-            const todayAll = rawData.filter(i => i.day === day);
-            const activeNow = todayAll.filter(i => {
-                const s = timeToVal(i.s), e = timeToVal(i.e);
-                return isToday && curMins >= s-5 && curMins <= e+5;
-            }).length;
-            const doneNow = todayAll.filter(i => isToday && curMins > timeToVal(i.e)+5).length;
-            const progress = todayAll.length ? Math.round((doneNow / todayAll.length) * 100) : 0;
-
-            document.getElementById('statActiveCount').innerText = isToday ? activeNow : "--";
-            document.getElementById('statDoneCount').innerText = isToday ? doneNow : "--";
-            document.getElementById('statProgress').innerText = isToday ? progress + "%" : "--";
-        }
-
-        if(!filtered.length) { area.innerHTML = '<p>لا توجد حصص لهذا الاختيار</p>'; return; }
-
-        if (isAdmin) {
-            let tableHTML = `<table class="admin-table"><thead><tr><th>المادة</th><th>المعلم</th><th>الوقت</th><th>الحالة</th></tr></thead><tbody>`;
-            filtered.forEach(l => {
-                const start = timeToVal(l.s), end = timeToVal(l.e);
-                let sTxt = 'مغلق', sCol = 'var(--gray)', pulseCls = '';
-                if(isToday) {
-                    if(curMins >= start-5 && curMins <= end+5) { sTxt = 'فاعلة'; sCol = 'var(--success)'; pulseCls = 'pulse-text'; }
-                    else if(curMins < start) { sTxt = 'قادمة'; sCol = 'var(--highlight)'; }
-                    else { sTxt = 'منتهية'; sCol = 'var(--danger)'; }
-                }
-                tableHTML += `<tr><td>${l.sub}<br><small>صف ${l.grade}</small></td><td>${l.teacher}</td><td>${l.s}-${l.e}</td><td style="color:${sCol};font-weight:bold" class="${pulseCls}">${sTxt}</td></tr>`;
-            });
-            area.innerHTML = tableHTML + `</tbody></table>`;
-        } else {
-            area.innerHTML = '';
-            filtered.forEach(l => {
-                const start = timeToVal(l.s), end = timeToVal(l.e);
-                let canOpen = (isToday && curMins >= start-5 && curMins <= end+5);
-                area.innerHTML += `
-                    <div class="lesson-card ${canOpen ? 'highlight-card' : ''}">
-                        <div style="display:flex; justify-content:space-between;"><b>${l.sub}</b> <span>${l.s}-${l.e}</span></div>
-                        <p style="font-size:0.8rem; margin:5px 0;">المعلم: ${l.teacher} | الصف: ${l.grade}</p>
-                        <button class="btn ${canOpen ? 'btn-go' : 'btn-locked'}" ${canOpen ? `onclick="window.open('${l.link}')"` : 'disabled'}>${canOpen ? 'دخول الآن' : 'مغلق حالياً'}</button>
-                    </div>`;
-            });
-        }
-    }
-
-    function timeToVal(t) { const c = (t || "00:00").replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632).split(':'); return parseInt(c[0]||0)*60 + parseInt(c[1]||0); }
-    function handleLogout() { sessionStorage.clear(); location.reload(); }
-    function showInstructions() { alert("تم تفعيل المزامنة التلقائية كل 5 دقائق. الحصة الجارية تومض للتنبيه."); }
-    function updateClock() {
-        const n = new Date(Date.now() + serverTimeOffset);
-        const clockEl = document.querySelector('.live-clock'), dateEl = document.querySelector('.live-date');
-        if(clockEl) clockEl.innerText = n.toLocaleTimeString('ar-EG');
-        if(dateEl) dateEl.innerText = n.toLocaleDateString('ar-EG', {day:'numeric', month:'long'});
-    }
-    
-    setInterval(updateClock, 1000);
-    window.onload = () => {
-        if(localStorage.getItem('cluster_theme') === 'dark') document.body.classList.add('dark-mode');
-        updateThemeIcon();
-        if (sessionStorage.getItem('cluster_isLoggedIn')) showApp(); else updateClock();
-    };
-</script>
-</body>
-</html>

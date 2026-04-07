@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة العنقود الرقمية - الكود الرئيسي-2 (المحصن)</title>
+    <title>منصة العنقود الرقمية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -31,7 +31,7 @@
         .main-logo { width: 90px; height: auto; margin-top: -30px; margin-bottom: 10px; }
         .designer-tag { font-size: 0.8rem; color: var(--gray); margin-bottom: 20px; }
 
-        input[type="text"], select { width: 100%; padding: 14px; border-radius: 15px; border: 2px solid var(--border); margin-bottom: 12px; outline: none; text-align: center; font-size: 1rem; background: var(--card); color: var(--text); }
+        input[type="text"], select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--border); margin-bottom: 12px; outline: none; text-align: center; font-size: 1rem; background: var(--card); color: var(--text); }
         .btn { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; font-size: 1.1rem; }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 6px 0 #1d4ed8; }
         .btn-exit { background: var(--danger); color: white; box-shadow: 0 6px 0 var(--danger-dark); }
@@ -125,7 +125,7 @@
     <div class="q-link" onclick="loadData()"><i class="fas fa-sync-alt"></i> تحديث</div>
     <div class="q-link" onclick="alert('تعليمات: 1 للطالب، 1111 للمعلم، 1982 للإدارة.')"><i class="fas fa-info-circle"></i> تعليمات</div>
     <div class="q-link" onclick="window.open('https://wa.me/970599000000')"><i class="fab fa-whatsapp"></i> راسلنا</div>
-    <div class="q-link" onclick="alert('منصة العنقود v2.3 - م. سامي غنام')"><i class="fas fa-code"></i> حول</div>
+    <div class="q-link" onclick="alert('  نسخة 1.0 - م. سامي غنام')"><i class="fas fa-code"></i> حول</div>
 </div>
 
 <div id="logoutModal" class="modal-overlay">
@@ -183,8 +183,8 @@
             isFetching = false;
         }
     }
-    // مزامنة تلقائية كل 30 ثانية لضمان حداثة البيانات
-    setInterval(loadData, 30000);
+    // مزامنة تلقائية كل 20 ثانية لضمان حداثة البيانات
+    setInterval(loadData, 20000);
 
     function toggleTheme() {
         document.body.classList.toggle('dark-mode');
@@ -197,7 +197,7 @@
         let role = '';
         if(pass === "1") role = 'طالب';
         else if(pass === "1111") role = 'معلم';
-        else if(pass === "1982") role = 'ادارة واشراف';
+        else if(pass === "1234") role = 'ادارة واشراف';
         else { alert("الرمز غير صحيح"); return; }
         sessionStorage.setItem('isLoggedIn', 'true');
         sessionStorage.setItem('userRole', role);

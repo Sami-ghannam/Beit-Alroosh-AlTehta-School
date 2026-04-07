@@ -20,7 +20,6 @@
             position: relative;
         }
 
-        /* التصميم الترحيبي السابق */
         .top-bar {
             background: white; padding: 10px 20px; display: flex; justify-content: space-between;
             align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
@@ -46,7 +45,6 @@
         .btn-locked { background: var(--gray); color: white; box-shadow: 0 5px 0 #64748b; cursor: not-allowed; }
         .btn-ended { background: var(--danger); color: white; box-shadow: 0 5px 0 var(--danger-dark); cursor: not-allowed; }
 
-        /* شريط الطوارئ */
         .emergency-banner { 
             background: #fef2f2; border: 2px solid var(--danger); color: var(--danger);
             padding: 12px; border-radius: 15px; margin-bottom: 15px; font-weight: bold; width: 100%;
@@ -65,6 +63,7 @@
             position: fixed; bottom: 0; width: 100%; z-index: 2000;
         }
         .q-link { text-decoration: none; color: var(--text); font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+        .q-link-exit { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -128,16 +127,16 @@
 <div class="quick-links-bar">
     <div class="q-link" onclick="alert('المطور: م. سامي غنام')"><i class="fas fa-user-shield"></i> المطور</div>
     <div class="q-link" onclick="location.reload()"><i class="fas fa-sync"></i> تحديث</div>
+    <div class="q-link q-link-exit" onclick="handleLogout()"><i class="fas fa-power-off"></i> خروج نهائي</div>
 </div>
 
 <script>
     const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8Yk6Sq2bCZtlrH-mgqDZFYnRc54MYf8vAW6VIpW1WHIzKi5lkoBRTXjv5i8sXBkHMrbR_KHS-kMoV/pub?gid=0&single=true&output=csv';
     let rawData = [];
     let serverTimeOffset = 0;
-    let isEmergencyGlobal = false; // لمراقبة حالة الطوارئ من الشيت
+    let isEmergencyGlobal = false;
     const weekDaysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
 
-    // مزامنة الوقت
     async function syncTime() {
         try {
             const start = Date.now();
@@ -147,13 +146,10 @@
         } catch (e) { serverTimeOffset = 0; }
     }
 
-    // جلب البيانات وفحص وضع الطوارئ
     async function loadData() {
         try {
             const r = await fetch(sheetURL + '&t=' + Date.now());
             const t = await r.text();
-            
-            // فحص خلية الطوارئ (H2) في الشيت
             isEmergencyGlobal = t.includes("EMERGENCY");
             document.getElementById('emergencyBanner').style.display = isEmergencyGlobal ? 'block' : 'none';
 
@@ -171,7 +167,7 @@
         document.querySelectorAll('.live-date').forEach(el => el.innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'}));
     }
     setInterval(updateClock, 1000);
-    setInterval(loadData, 60000); // تحديث تلقائي كل دقيقة للمزامنة الحية
+    setInterval(loadData, 60000);
 
     function handleLogin() {
         const pass = document.getElementById('sysPass').value.trim();
@@ -181,18 +177,18 @@
         else if (pass === "1234") { role = 'supervisor'; portal = 'بوابة الإدارة'; badge = 'إدارة'; }
         else { alert("الرمز غير صحيح!"); return; }
         
-        localStorage.setItem('cluster_isLoggedIn', 'true');
-        localStorage.setItem('cluster_userRole', role);
-        localStorage.setItem('cluster_portalText', portal);
-        localStorage.setItem('cluster_badgeText', badge);
+        sessionStorage.setItem('cluster_isLoggedIn', 'true');
+        sessionStorage.setItem('cluster_userRole', role);
+        sessionStorage.setItem('cluster_portalText', portal);
+        sessionStorage.setItem('cluster_badgeText', badge);
         showApp();
     }
 
     function showApp() {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
-        document.getElementById('portalTitle').innerText = localStorage.getItem('cluster_portalText');
-        document.getElementById('userBadge').innerText = localStorage.getItem('cluster_badgeText');
+        document.getElementById('portalTitle').innerText = sessionStorage.getItem('cluster_portalText');
+        document.getElementById('userBadge').innerText = sessionStorage.getItem('cluster_badgeText');
         document.getElementById('userBadge').style.display = 'inline-block';
         
         const ds = document.getElementById('daySelect');
@@ -217,9 +213,8 @@
 
         filtered.forEach(l => {
             const start = timeToVal(l.s), end = timeToVal(l.e);
-            let status = "مجدولة", isLive = false, bHTML = "";
+            let isLive = false, bHTML = "";
             
-            // شرط الفتح: إما وضع الطوارئ مفعل عالمياً أو الوقت صحيح
             if (isEmergencyGlobal || (curDayName === l.day && curMins >= (start - 5) && curMins <= (end + 5))) {
                 isLive = true;
                 bHTML = `<button class="btn btn-go" onclick="window.open('${l.link}')">دخول الآن</button>`;
@@ -246,9 +241,14 @@
         return parseInt(clean[0]) * 60 + parseInt(clean[1]);
     }
 
-    function handleLogout() { localStorage.clear(); location.reload(); }
+    function handleLogout() { 
+        if(confirm("هل تريد تسجيل الخروج والعودة للشاشة الترحيبية؟")) {
+            sessionStorage.clear(); 
+            location.reload(); 
+        }
+    }
 
-    window.onload = () => { if (localStorage.getItem('cluster_isLoggedIn')) showApp(); else updateClock(); };
+    window.onload = () => { if (sessionStorage.getItem('cluster_isLoggedIn')) showApp(); else updateClock(); };
 </script>
 </body>
 </html>

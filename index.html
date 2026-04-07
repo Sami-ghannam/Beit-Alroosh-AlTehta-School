@@ -18,7 +18,6 @@
         .top-bar div { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
         #userBadge { background: var(--primary); color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 10px; display: none; }
 
-        /* تنسيق رسالة الخطأ العائمة */
         #errorToast {
             position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
             background: #1e293b; color: white; padding: 12px 25px; border-radius: 50px;
@@ -66,7 +65,7 @@
 <body>
 
 <div id="errorToast">
-    <span id="errorMsg">خطأ في الاتصال بالإنترنت</span>
+    <span id="errorMsg">استغرق الاتصال وقتاً طويلاً</span>
     <button onclick="retryConnection()" style="background:var(--primary); color:white; border:none; padding:5px 12px; border-radius:15px; cursor:pointer; font-size:0.8rem;">تحديث</button>
 </div>
 
@@ -138,24 +137,29 @@
         const toast = document.getElementById('errorToast');
         document.getElementById('errorMsg').innerText = msg;
         toast.style.display = 'flex';
-        setTimeout(() => { toast.style.display = 'none'; }, 6000);
+        // لا يتم إخفاؤها تلقائياً بسرعة لضمان رؤيتها بعد الانتظار الطويل
+        setTimeout(() => { toast.style.display = 'none'; }, 8000);
     }
 
     async function syncTime() {
         try { 
-            // مهلة انتظار 7 ثوانٍ لمزامنة الوقت
+            // صمت تام لمدة 7 ثوانٍ، تظهر الرسالة فقط عند الفشل النهائي
             const r = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron', { signal: AbortSignal.timeout(7000) });
             const d = await r.json(); 
             serverTimeOffset = new Date(d.datetime).getTime() - Date.now(); 
         } catch(e){
-            showError("فشل مزامنة الوقت. تأكد من الإنترنت.");
+            // لا تظهر رسالة التوقيت فوراً لتجنب الإزعاج، نكتفي بتسجيل الفشل داخلياً
             serverTimeOffset = 0; 
         }
     }
 
     async function loadData() {
+        // إظهار نص التحميل وإخفاء أي أخطاء سابقة
+        document.getElementById('displayArea').innerHTML = '<p id="loadingMsg">جاري مزامنة البيانات من الخادم...</p>';
+        document.getElementById('errorToast').style.display = 'none';
+
         try {
-            // مهلة انتظار 10 ثوانٍ لجلب البيانات
+            // انتظار صامت لمدة 10 ثوانٍ
             const r = await fetch(sheetURL + '&t=' + Date.now(), { signal: AbortSignal.timeout(10000) });
             if (!r.ok) throw new Error();
             const t = await r.text();
@@ -171,20 +175,28 @@
             }
             updateUI();
         } catch(e) {
-            showError("استغرق الاتصال وقتاً طويلاً.");
-            document.getElementById('displayArea').innerHTML = '<div style="color:var(--danger); padding:20px;">عذراً، لم نتمكن من جلب البيانات في الوقت المحدد. يرجى التأكد من جودة الإنترنت والضغط على تحديث.</div>';
+            // تظهر رسالة الفشل فقط بعد انتهاء الـ 10 ثوانٍ وفشل الطلب
+            showError("ضعف في الاتصال، استغرق الأمر أكثر من 10 ثوانٍ.");
+            document.getElementById('displayArea').innerHTML = `
+                <div style="color:var(--danger); padding:20px;">
+                    <i class="fas fa-exclame-triangle"></i><br>
+                    عذراً، استغرق الاتصال وقتاً طويلاً.<br>
+                    تأكد من جودة الإنترنت ثم اضغط تحديث.
+                </div>`;
         }
     }
 
     function retryConnection() {
-        document.getElementById('errorToast').style.display = 'none';
-        document.getElementById('displayArea').innerHTML = '<p>جاري إعادة المحاولة...</p>';
-        syncTime().then(loadData);
+        loadData();
     }
 
     function handleLogin() {
         const pass = document.getElementById('sysPass').value.trim();
-        if (!navigator.onLine) { showError("أنت غير متصل بالإنترنت حالياً."); return; }
+        // فحص سريع للحالة قبل المحاولة
+        if (!navigator.onLine) { 
+            showError("الجهاز غير متصل بالشبكة."); 
+            return; 
+        }
         
         let portal = '', badge = '';
         if (pass === "1") { portal = 'بوابة الطلبة'; badge = 'طالب'; }
@@ -212,7 +224,9 @@
         const ds = document.getElementById('daySelect');
         ds.innerHTML = '<option value="">--- اليوم ---</option>';
         weekDaysArr.forEach(d => ds.innerHTML += `<option value="${d}">${d}</option>`);
-        ds.value = weekDaysArr[new Date(Date.now() + serverTimeOffset).getDay()] || "الأحد";
+        // ضبط اليوم تلقائياً بناءً على وقت السيرفر أو الجهاز
+        ds.value = weekDaysArr[new Date().getDay()] || "الأحد";
+        
         syncTime().then(loadData);
     }
 
@@ -228,7 +242,7 @@
         const isToday = (weekDaysArr[now.getDay()] === day);
 
         let filtered = rawData.filter(i => i.day === day && (grade === "" || i.grade === grade) && (teacher === "" || i.teacher === teacher));
-        area.innerHTML = filtered.length ? '' : '<p>لا توجد حصص لهذا الاختيار</p>';
+        area.innerHTML = filtered.length ? '' : '<p>لا توجد حصص مجدولة لهذا الاختيار</p>';
 
         if (isAdmin) {
             let tableHTML = `<table class="admin-table"><thead><tr><th>المادة</th><th>المعلم</th><th>الوقت</th><th>الحالة</th></tr></thead><tbody>`;
@@ -259,8 +273,8 @@
 
     function timeToVal(t) { const c = (t || "00:00").replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632).split(':'); return parseInt(c[0]||0)*60 + parseInt(c[1]||0); }
     function handleLogout() { sessionStorage.clear(); location.reload(); }
-    function hardReset() { if(confirm("مسح الكاش؟")) { localStorage.clear(); sessionStorage.clear(); location.reload(); } }
-    function showInstructions() { alert("تعليمات: اختر اليوم والصف لعرض الجدول. زر الدخول يتفعل وقت الحصة."); }
+    function hardReset() { if(confirm("مسح الكاش والبيانات؟")) { localStorage.clear(); sessionStorage.clear(); location.reload(); } }
+    function showInstructions() { alert("اختر اليوم والصف لعرض الجدول. زر الدخول يفتح قبل الحصة بـ 5 دقائق."); }
     
     function updateClock() {
         const n = new Date(Date.now() + serverTimeOffset);
@@ -269,7 +283,10 @@
     }
     
     setInterval(updateClock, 1000);
-    window.onload = () => { if (sessionStorage.getItem('cluster_isLoggedIn')) showApp(); else updateClock(); };
+    window.onload = () => { 
+        if (sessionStorage.getItem('cluster_isLoggedIn')) showApp(); 
+        else updateClock(); 
+    };
 </script>
 </body>
 </html>

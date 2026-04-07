@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة العنقود الرقمية</title>
+    <title>منصة العنقود الرقمية - الكود الرئيسي-2 (دعم الشعب)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -31,12 +31,12 @@
         .main-logo { width: 90px; height: auto; margin-top: -30px; margin-bottom: 10px; }
         .designer-tag { font-size: 0.8rem; color: var(--gray); margin-bottom: 20px; }
 
-        input[type="text"], select { width: 90%; padding: 14px; border-radius: 15px; border: 2px solid var(--border); margin-bottom: 12px; outline: none; text-align: center; font-size: 1rem; background: var(--card); color: var(--text); }
+        input[type="text"], select { width: 100%; padding: 10px; border-radius: 15px; border: 2px solid var(--border); margin-bottom: 12px; outline: none; text-align: center; font-size: 1rem; background: var(--card); color: var(--text); box-sizing: border-box; }
         .btn { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; font-size: 1.1rem; }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 6px 0 #1d4ed8; }
         .btn-exit { background: var(--danger); color: white; box-shadow: 0 6px 0 var(--danger-dark); }
 
-        /* نظام UX اللوني للمنصة */
+        /* نظام UX اللوني */
         .btn-status-active { background: var(--success) !important; color: white !important; box-shadow: 0 6px 0 #059669 !important; animation: pulse 2s infinite; }
         .btn-status-upcoming { background: var(--warning) !important; color: white !important; box-shadow: 0 6px 0 #d97706 !important; opacity: 0.9; }
         .btn-status-expired { background: var(--gray) !important; color: white !important; box-shadow: 0 6px 0 #64748b !important; cursor: not-allowed; opacity: 0.6; }
@@ -46,6 +46,11 @@
         /* تنبيه ضعف الإنترنت */
         #connAlert { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; padding: 10px 20px; border-radius: 30px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); border: 2px solid white; }
 
+        #mainApp { display: none; padding: 20px; padding-bottom: 100px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 5000; }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 25px; text-align: center; width: 300px; }
+
+        /* إحصائيات الإدارة */
         .admin-stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 20px; text-align: center; }
         .admin-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background: var(--card); }
@@ -53,11 +58,7 @@
         .admin-table td { padding: 10px; border-bottom: 1px solid var(--border); text-align: center; }
 
         .quick-links-bar { background: var(--card); padding: 12px; display: flex; justify-content: center; gap: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); border-top: 1px solid var(--border); position: fixed; bottom: 0; width: 100%; z-index: 2000; }
-        .q-link { text-decoration: none; color: var(--text); font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer; }
-
-        #mainApp { display: none; padding: 20px; padding-bottom: 100px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 5000; }
-        .modal-content { background: var(--card); padding: 30px; border-radius: 25px; text-align: center; width: 300px; }
+        .q-link { text-decoration: none; color: var(--text); font-size: 0.75rem; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -105,13 +106,22 @@
                 <button onclick="handleLogout()" style="border:none; background:none; color:var(--danger); font-weight:bold; cursor:pointer;">خروج</button>
             </div>
             
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
                 <select id="daySelect" onchange="updateUI()"></select>
                 <select id="gradeSelect" onchange="updateUI()">
-                    <option value="">كل الصفوف</option>
+                    <option value="">الصف</option>
                     <script>for(let i=1; i<=12; i++) document.write(`<option value="${i}">${i}</option>`);</script>
                 </select>
+                <select id="sectionSelect" onchange="updateUI()">
+                    <option value="أ">شعبة أ</option>
+                    <option value="ب">شعبة ب</option>
+                    <option value="ج">شعبة ج</option>
+                    <option value="د">شعبة د</option>
+                    <option value="هـ">شعبة هـ</option>
+                    <option value="و">شعبة و</option>
+                </select>
             </div>
+
             <div id="adminTeacherFilter" style="display:none; margin-top:5px;">
                 <select id="teacherSelect" onchange="updateUI()"></select>
             </div>
@@ -124,8 +134,7 @@
 <div class="quick-links-bar">
     <div class="q-link" onclick="loadData()"><i class="fas fa-sync-alt"></i> تحديث</div>
     <div class="q-link" onclick="alert('تعليمات: 1 للطالب، 1111 للمعلم، 1982 للإدارة.')"><i class="fas fa-info-circle"></i> تعليمات</div>
-    <div class="q-link" onclick="window.open('https://wa.me/970599000000')"><i class="fab fa-whatsapp"></i> راسلنا</div>
-    <div class="q-link" onclick="alert('  نسخة 1.0 - م. سامي غنام')"><i class="fas fa-code"></i> حول</div>
+    <div class="q-link" onclick="alert('منصة العنقود v2.4 - م. سامي غنام')"><i class="fas fa-code"></i> حول</div>
 </div>
 
 <div id="logoutModal" class="modal-overlay">
@@ -144,7 +153,6 @@
     const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8Yk6Sq2bCZtlrH-mgqDZFYnRc54MYf8vAW6VIpW1WHIzKi5lkoBRTXjv5i8sXBkHMrbR_KHS-kMoV/pub?gid=0&single=true&output=csv';
     const weekDaysArr = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
 
-    // ساعة وتاريخ
     function updateClock() {
         const now = new Date();
         document.getElementById('clockDisplay').innerText = now.toLocaleTimeString('ar-EG');
@@ -152,52 +160,44 @@
     }
     setInterval(updateClock, 1000);
 
-    // نظام فحص الاتصال والمزامنة (احترافي)
     async function loadData() {
         if(isFetching) return;
         isFetching = true;
         const alertBox = document.getElementById('connAlert');
-        
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => { 
-            controller.abort(); 
-            alertBox.style.display = 'block'; // ظهور التنبيه بعد 7-10 ثواني فشل
-        }, 8000);
+        const timeoutId = setTimeout(() => { controller.abort(); alertBox.style.display = 'block'; }, 8000);
 
         try {
             const r = await fetch(sheetURL + '&t=' + Date.now(), { signal: controller.signal });
             const t = await r.text();
             clearTimeout(timeoutId);
-            alertBox.style.display = 'none'; // اختفاء التنبيه عند نجاح الاتصال
+            alertBox.style.display = 'none';
 
             rawData = t.split('\n').slice(1).filter(row => row.trim() !== "").map(row => {
                 const c = row.split(',');
-                return { day: c[0]?.trim(), grade: c[1]?.trim(), sub: c[2]?.trim(), teacher: c[3]?.trim(), s: c[4]?.trim(), e: c[5]?.trim(), link: c[6]?.trim() };
+                return { 
+                    day: c[0]?.trim(), 
+                    grade: c[1]?.trim(), 
+                    section: c[2]?.trim() || "أ", // الشعبة الافتراضية
+                    sub: c[3]?.trim(), 
+                    teacher: c[4]?.trim(), 
+                    s: c[5]?.trim(), 
+                    e: c[6]?.trim(), 
+                    link: c[7]?.trim() 
+                };
             });
             if(sessionStorage.getItem('userRole') === 'ادارة واشراف') fillTeachers();
             updateUI();
-        } catch(e) {
-            console.warn("Connection slow or lost");
-            alertBox.style.display = 'block';
-        } finally {
-            isFetching = false;
-        }
+        } catch(e) { alertBox.style.display = 'block'; } finally { isFetching = false; }
     }
-    // مزامنة تلقائية كل 20 ثانية لضمان حداثة البيانات
-    setInterval(loadData, 20000);
-
-    function toggleTheme() {
-        document.body.classList.toggle('dark-mode');
-        const icon = document.getElementById('themeIcon');
-        icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun theme-toggle' : 'fas fa-moon theme-toggle';
-    }
+    setInterval(loadData, 30000);
 
     function handleLogin() {
         const pass = document.getElementById('sysPass').value.trim();
         let role = '';
         if(pass === "1") role = 'طالب';
         else if(pass === "1111") role = 'معلم';
-        else if(pass === "1234") role = 'ادارة واشراف';
+        else if(pass === "1982") role = 'ادارة واشراف';
         else { alert("الرمز غير صحيح"); return; }
         sessionStorage.setItem('isLoggedIn', 'true');
         sessionStorage.setItem('userRole', role);
@@ -226,16 +226,22 @@
         const area = document.getElementById('displayArea');
         const day = document.getElementById('daySelect').value;
         const grade = document.getElementById('gradeSelect').value;
+        const section = document.getElementById('sectionSelect').value || "أ";
         const role = sessionStorage.getItem('userRole');
         const teacher = (role === 'ادارة واشراف') ? document.getElementById('teacherSelect').value : "";
         const now = new Date();
         const curMins = now.getHours() * 60 + now.getMinutes();
         const isToday = (weekDaysArr[now.getDay()] === day);
 
-        let filtered = rawData.filter(i => i.day === day && (grade === "" || i.grade === grade) && (teacher === "" || i.teacher === teacher));
+        let filtered = rawData.filter(i => 
+            i.day === day && 
+            (grade === "" || i.grade === grade) && 
+            (section === "" || i.section === section) &&
+            (teacher === "" || i.teacher === teacher)
+        );
 
         if(role === 'ادارة واشراف') {
-            let html = `<table class="admin-table"><thead><tr><th>الحصة</th><th>الوقت</th><th>الحالة</th></tr></thead><tbody>`;
+            let html = `<table class="admin-table"><thead><tr><th>الحصة</th><th>الوقت</th><th>الشعبة</th><th>الحالة</th></tr></thead><tbody>`;
             filtered.forEach(l => {
                 const start = timeToVal(l.s), end = timeToVal(l.e);
                 let status = 'مغلق', color = 'var(--gray)';
@@ -244,7 +250,7 @@
                     else if(curMins < start) { status = 'قادمة'; color = 'var(--warning)'; }
                     else { status = 'منتهية'; color = 'var(--danger)'; }
                 }
-                html += `<tr><td><b>${l.sub}</b><br><small>${l.teacher}</small></td><td>${l.s} - ${l.e}</td><td style="color:${color};font-weight:bold">${status}</td></tr>`;
+                html += `<tr><td><b>${l.sub}</b><br><small>${l.teacher}</small></td><td>${l.s}-${l.e}</td><td>${l.section}</td><td style="color:${color};font-weight:bold">${status}</td></tr>`;
             });
             area.innerHTML = html + "</tbody></table>";
             updateStats(filtered, isToday, curMins);
@@ -260,7 +266,7 @@
                 }
 
                 area.innerHTML += `<div style="background:var(--card); border:1px solid var(--border); padding:15px; border-radius:20px; margin-bottom:10px; text-align:right;">
-                    <b>${l.sub}</b> <span style="float:left; color:var(--primary)">${l.s} - ${l.e}</span><br>
+                    <b>${l.sub} - شعبة (${l.section})</b> <span style="float:left; color:var(--primary)">${l.s} - ${l.e}</span><br>
                     <small>المعلم: ${l.teacher} | الصف: ${l.grade}</small>
                     <button class="btn ${statusClass}" style="margin-top:10px;" ${canOpen ? `onclick="window.open('${l.link}')"` : 'disabled'}>
                         ${btnText}
@@ -289,6 +295,12 @@
         const list = [...new Set(rawData.map(i => i.teacher))].filter(n => n);
         ts.innerHTML = '<option value="">كل المعلمين</option>';
         list.forEach(t => ts.innerHTML += `<option value="${t}">${t}</option>`);
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const icon = document.getElementById('themeIcon');
+        icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun theme-toggle' : 'fas fa-moon theme-toggle';
     }
 
     function timeToVal(t) { if(!t) return 0; const c = t.split(':'); return parseInt(c[0])*60 + parseInt(c[1]); }

@@ -126,6 +126,9 @@
 
 <div class="quick-links-bar">
     <div class="q-link" onclick="alert('المطور: م. سامي غنام')"><i class="fas fa-user-shield"></i> المطور</div>
+    <div class="q-link" onclick="showInstructions()" style="color: var(--highlight);">
+        <i class="fas fa-info-circle"></i> تعليمات المستخدم
+    </div>
     <div class="q-link" onclick="openWhatsApp()" style="color: var(--whatsapp);"><i class="fab fa-whatsapp"></i> راسلنا</div>
     <div class="q-link" onclick="location.reload()"><i class="fas fa-sync"></i> تحديث</div>
 </div>
@@ -179,19 +182,28 @@
     }
 
     function handleLogout() {
-        // إخفاء الـ App فوراً قبل المسح لضمان عدم ظهور بقايا الكود
-        document.getElementById('mainApp').style.display = 'none';
+        if(document.getElementById('mainApp')) document.getElementById('mainApp').style.display = 'none';
         sessionStorage.clear();
         location.reload();
     }
 
     function hardReset() {
         if(confirm("سيتم تسجيل الخروج ومسح كافة البيانات. هل أنت متأكد؟")) {
-            document.getElementById('mainApp').style.display = 'none';
+            if(document.getElementById('mainApp')) document.getElementById('mainApp').style.display = 'none';
             localStorage.clear();
             sessionStorage.clear();
             location.href = window.location.pathname + "?t=" + Date.now();
         }
+    }
+
+    function showInstructions() {
+        alert(
+            "تعليمات منصة العنقود الرقمية:\n\n" +
+            "1. اختر الصف الدراسي من القائمة لعرض الجدول.\n" +
+            "2. زر (دخول الآن) يتفعل تلقائياً خلال موعد الحصة.\n" +
+            "3. في حال حدوث مشكلة تقنية، استخدم زر (زر الخروج) في الشاشة الأولى لمسح الكاش.\n" +
+            "4. اضغط على (تحديث) لمزامنة الوقت والحصص فوراً."
+        );
     }
 
     function showApp() {
@@ -247,7 +259,7 @@
     }
 
     function openWhatsApp() {
-        const phoneNumber = "970590000000"; // ضع رقمك هنا
+        const phoneNumber = "970000000000"; // رقم التواصل
         const message = encodeURIComponent("مرحباً م. سامي، لدي استفسار بخصوص المنصة:");
         window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
     }

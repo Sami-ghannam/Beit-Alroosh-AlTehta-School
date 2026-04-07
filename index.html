@@ -18,7 +18,7 @@
         .top-bar div { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
         #userBadge { background: var(--primary); color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 10px; display: none; }
 
-        /* Error Message Style */
+        /* تنسيق رسالة الخطأ العائمة */
         #errorToast {
             position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
             background: #1e293b; color: white; padding: 12px 25px; border-radius: 50px;
@@ -143,7 +143,8 @@
 
     async function syncTime() {
         try { 
-            const r = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron', { signal: AbortSignal.timeout(5000) });
+            // مهلة انتظار 7 ثوانٍ لمزامنة الوقت
+            const r = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron', { signal: AbortSignal.timeout(7000) });
             const d = await r.json(); 
             serverTimeOffset = new Date(d.datetime).getTime() - Date.now(); 
         } catch(e){
@@ -154,7 +155,8 @@
 
     async function loadData() {
         try {
-            const r = await fetch(sheetURL + '&t=' + Date.now(), { signal: AbortSignal.timeout(7000) });
+            // مهلة انتظار 10 ثوانٍ لجلب البيانات
+            const r = await fetch(sheetURL + '&t=' + Date.now(), { signal: AbortSignal.timeout(10000) });
             if (!r.ok) throw new Error();
             const t = await r.text();
             rawData = t.split('\n').slice(1).filter(row => row.trim() !== "").map(row => {
@@ -169,13 +171,14 @@
             }
             updateUI();
         } catch(e) {
-            showError("فشل تحميل جدول الحصص.");
-            document.getElementById('displayArea').innerHTML = '<div style="color:var(--danger); padding:20px;">خطأ في تحميل البيانات. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</div>';
+            showError("استغرق الاتصال وقتاً طويلاً.");
+            document.getElementById('displayArea').innerHTML = '<div style="color:var(--danger); padding:20px;">عذراً، لم نتمكن من جلب البيانات في الوقت المحدد. يرجى التأكد من جودة الإنترنت والضغط على تحديث.</div>';
         }
     }
 
     function retryConnection() {
         document.getElementById('errorToast').style.display = 'none';
+        document.getElementById('displayArea').innerHTML = '<p>جاري إعادة المحاولة...</p>';
         syncTime().then(loadData);
     }
 

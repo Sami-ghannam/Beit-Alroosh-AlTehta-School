@@ -17,9 +17,9 @@
             background-color: var(--bg); color: var(--text); 
             margin: 0; padding: 0; min-height: 100vh;
             display: flex; flex-direction: column;
-            position: relative;
         }
 
+        /* --- الهيدر العلوي --- */
         .top-bar {
             background: white; padding: 10px 20px; display: flex; justify-content: space-between;
             align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
@@ -27,24 +27,29 @@
         .top-bar div { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
         #userBadge { background: var(--primary); color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; margin-left: 10px; display: none; }
 
+        /* --- تصميم الإطارات والبطاقات --- */
         .welcome-page { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; gap: 20px; padding-bottom: 100px; }
         .welcome-frame { background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 12px; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); width: 100%; max-width: 450px; }
         .auth-card, .inner-app-content { background: var(--card); padding: 30px 20px; border-radius: 32px; text-align: center; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box; }
 
+        /* --- العنوان المنحني --- */
         .curved-title-container { width: 100%; height: 110px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
         .curved-svg { width: 100%; height: 100%; overflow: visible; }
-        .curved-text { font-size: 34px; font-weight: 900; fill: var(--primary); font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .curved-text { font-size: 34px; font-weight: 900; fill: var(--primary); }
 
-        .designer-tag { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; background: #f8fafc; padding: 5px 15px; border-radius: 50px; border: 1px solid #e2e8f0; position: relative; z-index: 1; }
+        .designer-tag { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; background: #f8fafc; padding: 5px 15px; border-radius: 50px; border: 1px solid #e2e8f0; }
 
-        input[type="text"], select { width: 100%; padding: 14px; border-radius: 15px; border: 2px solid #e2e8f0; margin-bottom: 12px; outline: none; text-align: center; font-size: 1rem; position: relative; z-index: 1; box-sizing: border-box; }
+        /* --- العناصر التفاعلية --- */
+        input[type="text"], select { width: 100%; padding: 14px; border-radius: 15px; border: 2px solid #e2e8f0; margin-bottom: 12px; outline: none; text-align: center; font-size: 1rem; box-sizing: border-box; }
         
-        .btn { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; font-size: 1.1rem; transition: 0.1s; position: relative; z-index: 1; text-decoration: none; }
+        .btn { width: 100%; padding: 16px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; font-size: 1.1rem; transition: 0.1s; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 6px 0 #1d4ed8; }
+        .btn-reset { background: #f1f5f9; color: var(--danger); box-shadow: 0 5px 0 #cbd5e1; font-size: 0.9rem; }
         .btn-go { background: var(--success); color: white; box-shadow: 0 5px 0 #059669; }
-        .btn-locked { background: var(--gray); color: white; box-shadow: 0 5px 0 #64748b; cursor: not-allowed; }
-        .btn-ended { background: var(--danger); color: white; box-shadow: 0 5px 0 var(--danger-dark); cursor: not-allowed; }
+        .btn-locked { background: var(--gray); color: white; cursor: not-allowed; opacity: 0.8; }
+        .btn-ended { background: var(--danger); color: white; cursor: not-allowed; }
 
+        /* --- وضع الطوارئ --- */
         .emergency-banner { 
             background: #fef2f2; border: 2px solid var(--danger); color: var(--danger);
             padding: 12px; border-radius: 15px; margin-bottom: 15px; font-weight: bold; width: 100%;
@@ -54,7 +59,7 @@
 
         #mainApp { display: none; padding: 20px; padding-bottom: 120px; flex: 1; }
         .app-container { max-width: 950px; margin: 0 auto; width: 100%; }
-        .lesson-card { border-radius: 18px; padding: 15px; margin-bottom: 12px; border: 2px solid #e2e8f0; text-align: right; width: 100%; box-sizing: border-box; background: rgba(255, 255, 255, 0.9); transition: 0.3s; }
+        .lesson-card { border-radius: 18px; padding: 15px; margin-bottom: 12px; border: 2px solid #e2e8f0; text-align: right; width: 100%; box-sizing: border-box; background: white; }
         .highlight-card { border-color: var(--highlight) !important; background-color: #fff7ed !important; }
         
         .quick-links-bar {
@@ -62,15 +67,14 @@
             flex-wrap: wrap; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); border-top: 1px solid #e2e8f0;
             position: fixed; bottom: 0; width: 100%; z-index: 2000;
         }
-        .q-link { text-decoration: none; color: var(--text); font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-        .q-link-exit { color: var(--danger); }
+        .q-link { text-decoration: none; color: var(--text); font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 6px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="top-bar">
     <div class="live-date">--/--/----</div>
-    <div id="dynamicHeader" style="color: var(--primary); font-size: 1.1rem; font-weight: 900;">منصة العنقود الرقمية</div>
+    <div id="dynamicHeader">منصة العنقود</div>
     <div style="display: flex; align-items: center;">
         <span id="userBadge"></span>
         <div class="live-clock">--:--:--</div>
@@ -91,7 +95,12 @@
             <div class="designer-tag">تصميم وبرمجة: م.سامي غنام</div>
             <div style="width: 100%; max-width: 320px;">
                 <input type="text" id="sysPass" placeholder="أدخل رمز الدخول">
-                <button class="btn btn-primary" onclick="handleLogin()"><i class="fas fa-sign-in-alt"></i> دخول للمنصة</button>
+                <button class="btn btn-primary" onclick="handleLogin()">
+                    <i class="fas fa-sign-in-alt"></i> دخول للمنصة
+                </button>
+                <button class="btn btn-reset" onclick="hardReset()">
+                    <i class="fas fa-trash-alt"></i> خروج ومسح بيانات المتصفح
+                </button>
             </div>
         </div>
     </div>
@@ -102,7 +111,7 @@
         <div class="welcome-frame">
             <div class="inner-app-content">
                 <div id="emergencyBanner" class="emergency-banner">
-                    <i class="fas fa-bullhorn"></i> وضع الطوارئ نشط: الروابط متاحة الآن بقرار الإدارة
+                    <i class="fas fa-bullhorn"></i> وضع الطوارئ نشط: الروابط متاحة الآن
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; width: 100%;">
@@ -117,7 +126,6 @@
                         <script>for(let i=1;i<=12;i++) document.write(`<option value="${i}">${i}</option>`)</script>
                     </select>
                 </div>
-                <select id="teacherHighlight" onchange="updateUI()" style="display:none;"></select>
                 <div id="lessonsGrid" style="width: 100%; margin-top: 15px;"></div>
             </div>
         </div>
@@ -127,7 +135,7 @@
 <div class="quick-links-bar">
     <div class="q-link" onclick="alert('المطور: م. سامي غنام')"><i class="fas fa-user-shield"></i> المطور</div>
     <div class="q-link" onclick="location.reload()"><i class="fas fa-sync"></i> تحديث</div>
-    <div class="q-link q-link-exit" onclick="handleLogout()"><i class="fas fa-power-off"></i> خروج نهائي</div>
+    <div class="q-link" style="color:var(--danger)" onclick="handleLogout()"><i class="fas fa-power-off"></i> خروج</div>
 </div>
 
 <script>
@@ -140,9 +148,9 @@
     async function syncTime() {
         try {
             const start = Date.now();
-            const response = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron');
-            const data = await response.json();
-            serverTimeOffset = new Date(data.datetime).getTime() - (Date.now() - (Date.now()-start)/2);
+            const r = await fetch('https://worldtimeapi.org/api/timezone/Asia/Hebron');
+            const d = await r.json();
+            serverTimeOffset = new Date(d.datetime).getTime() - (Date.now() - (Date.now()-start)/2);
         } catch (e) { serverTimeOffset = 0; }
     }
 
@@ -158,13 +166,13 @@
                 return { day: c[0].trim(), grade: c[1].trim(), sub: c[2].trim(), teacher: c[3].trim(), s: c[4].trim(), e: c[5].trim(), link: c[6].trim() };
             });
             updateUI();
-        } catch (e) { console.error("Data Load Error"); }
+        } catch (e) { console.error("Error"); }
     }
 
     function updateClock() {
         const now = new Date(Date.now() + serverTimeOffset);
-        document.querySelectorAll('.live-clock').forEach(el => el.innerText = now.toLocaleTimeString('ar-EG'));
-        document.querySelectorAll('.live-date').forEach(el => el.innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'}));
+        document.querySelector('.live-clock').innerText = now.toLocaleTimeString('ar-EG');
+        document.querySelector('.live-date').innerText = now.toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
     }
     setInterval(updateClock, 1000);
     setInterval(loadData, 60000);
@@ -178,11 +186,20 @@
         else { alert("الرمز غير صحيح!"); return; }
         
         sessionStorage.setItem('cluster_isLoggedIn', 'true');
-        sessionStorage.setItem('cluster_userRole', role);
         sessionStorage.setItem('cluster_portalText', portal);
         sessionStorage.setItem('cluster_badgeText', badge);
         showApp();
     }
+
+    function hardReset() {
+        if(confirm("سيتم مسح كافة البيانات المخزنة للدخول السلس، هل أنت متأكد؟")) {
+            localStorage.clear();
+            sessionStorage.clear();
+            location.reload();
+        }
+    }
+
+    function handleLogout() { sessionStorage.clear(); location.reload(); }
 
     function showApp() {
         document.getElementById('loginScreen').style.display = 'none';
@@ -194,7 +211,6 @@
         const ds = document.getElementById('daySelect');
         ds.innerHTML = '<option value="">-- اختر اليوم --</option>';
         weekDaysArr.forEach(d => ds.innerHTML += `<option value="${d}">${d}</option>`);
-        
         const now = new Date(Date.now() + serverTimeOffset);
         ds.value = weekDaysArr[now.getDay()] || "الأحد";
         syncTime().then(loadData);
@@ -209,43 +225,31 @@
         const curMins = now.getHours() * 60 + now.getMinutes();
 
         let filtered = rawData.filter(i => i.day === day && (grade === "" || i.grade === grade));
-        grid.innerHTML = (grade === "") ? '<p style="color:var(--gray); margin-top:20px;">يرجى اختيار الصف</p>' : '';
+        grid.innerHTML = (grade === "") ? '<p>يرجى اختيار الصف</p>' : '';
 
         filtered.forEach(l => {
             const start = timeToVal(l.s), end = timeToVal(l.e);
-            let isLive = false, bHTML = "";
-            
-            if (isEmergencyGlobal || (curDayName === l.day && curMins >= (start - 5) && curMins <= (end + 5))) {
-                isLive = true;
-                bHTML = `<button class="btn btn-go" onclick="window.open('${l.link}')">دخول الآن</button>`;
-            } else if (curDayName === l.day && curMins < (start - 5)) {
-                bHTML = `<button class="btn btn-locked" disabled>لم تبدأ</button>`;
-            } else {
-                bHTML = `<button class="btn btn-ended" disabled>منتهية</button>`;
-            }
+            let canOpen = isEmergencyGlobal || (curDayName === l.day && curMins >= (start - 5) && curMins <= (end + 5));
+            let isEnded = (curDayName === l.day && curMins > (end + 5));
 
             grid.innerHTML += `
-                <div class="lesson-card ${isLive ? 'highlight-card' : ''}">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h4 style="margin:0; color:var(--primary);">${l.sub}</h4>
-                        <span style="font-weight:bold;">${l.s} - ${l.e}</span>
+                <div class="lesson-card ${canOpen ? 'highlight-card' : ''}">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>${l.sub}</strong>
+                        <span>${l.s} - ${l.e}</span>
                     </div>
-                    <p style="margin:5px 0; font-size:0.9rem;">المعلم: ${l.teacher} | الصف: ${l.grade}</p>
-                    ${bHTML}
+                    <p>المعلم: ${l.teacher} | الصف: ${l.grade}</p>
+                    <button class="btn ${canOpen ? 'btn-go' : (isEnded ? 'btn-ended' : 'btn-locked')}" 
+                            ${canOpen ? `onclick="window.open('${l.link}')"` : 'disabled'}>
+                        ${canOpen ? 'دخول الآن' : (isEnded ? 'منتهية' : 'مغلق')}
+                    </button>
                 </div>`;
         });
     }
 
     function timeToVal(t) {
-        const clean = t.replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632).split(':');
-        return parseInt(clean[0]) * 60 + parseInt(clean[1]);
-    }
-
-    function handleLogout() { 
-        if(confirm("هل تريد تسجيل الخروج والعودة للشاشة الترحيبية؟")) {
-            sessionStorage.clear(); 
-            location.reload(); 
-        }
+        const c = t.replace(/[٠-٩]/g, d => d.charCodeAt(0) - 1632).split(':');
+        return parseInt(c[0]) * 60 + parseInt(c[1]);
     }
 
     window.onload = () => { if (sessionStorage.getItem('cluster_isLoggedIn')) showApp(); else updateClock(); };
